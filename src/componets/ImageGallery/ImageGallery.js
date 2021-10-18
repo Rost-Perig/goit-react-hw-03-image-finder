@@ -23,13 +23,11 @@ class ImageGallery extends Component {
     };
 
     async componentDidUpdate(prevProps, prevState) {
-
         if ((prevProps.searchQuery !== this.props.searchQuery)) {
             this.setState({
                 status: 'pending',
             })
             let newRequest;
-            // let newPage = page;
             try {
                 newRequest = await imgApiService.fetchImages(this.props.searchQuery, 1);
             }
@@ -42,46 +40,45 @@ class ImageGallery extends Component {
                 return this.setState({status: 'rejected'})
             }
 
-            return this.setState({
+            this.setState({
                 searchQuery: this.props.searchQuery,
                 imgObjArr: [ ...newRequest.data.hits],
                 page: 1,
                 totalImg: newRequest.data.totalHits,
                 status: 'resolved',
-                scrollToElId: 0
             });  
         };
         
     };
-    
+
+
     loadMore = async () => {
-        const { page } = this.state;
-
-        this.setState({
-            status: 'pending',
-        })
-        let newRequest;
-        let newPage = page + 1;
-        try {
-            newRequest = await imgApiService.fetchImages(this.props.searchQuery, newPage);
-        }
-        catch (error) {
-            console.log('Error: request failed');
-            return this.setState({ status: 'failed' })
-        };
-
-        if (newRequest.data.totalHits === 0) {
-            return this.setState({ status: 'rejected' })
-        }
         
-        this.setState({
-            imgObjArr: [...this.state.imgObjArr, ...newRequest.data.hits],
-            page: newPage,
-            totalImg: newRequest.data.totalHits,
-            status: 'resolved',scrollToElId: newRequest.data.hits[0].id
-        });
+        const { searchQuery, page } = this.state;
+        if (searchQuery === this.props.searchQuery) {
+            let newRequest;
+            let newPage = page + 1;
+            try {
+                newRequest = await imgApiService.fetchImages(searchQuery, newPage);
+            }
+            catch (error) {
+                console.log('Error: request failed');
+                return this.setState({status: 'failed'})
+            };
 
-        this.scrollFoo()
+            this.setState(prevState => {
+                return ({
+                    imgObjArr: [...prevState.imgObjArr, ...newRequest.data.hits],
+                    page: newPage,
+                    totalImg: newRequest.data.totalHits,
+                })
+            });
+            
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth',
+            }); 
+        };
     };
 
     closeModalClick = (data) => {
@@ -113,17 +110,8 @@ class ImageGallery extends Component {
         })
     };
 
-    scrollFoo = () => {
-        if (this.state.scrollToElId !== 0) {
-            let el = document.querySelector(`[id="${this.state.scrollToElId}"]`);
-            el.scrollIntoView({ block: "start", behavior: "smooth" });
-        }
-    };
-
-
     render() {
         // console.log('state: ', this.state)
-        
         const { searchQuery, imgObjArr, status, totalImg, showModal, largeImageURL, tags,  page } = this.state;
         const { openModal, loadMore, closeModalClick, toggleModal, moveImg } = this;
 
@@ -147,7 +135,7 @@ class ImageGallery extends Component {
             return (
             <>
                 <div className={s.galleryContainer} id="events" >
-                    <h2 className={s.galleryTitle}>Найдено {totalImg} изображений по запросу "{searchQuery.toUpperCase()}":</h2>
+                        <h2 className={s.galleryTitle}>Найдено {totalImg} изображений по запросу "{searchQuery.toUpperCase()}":</h2>
                     <ul className={s.ImageGallery} >
                         {imgObjArr.map(item => {
                             const { id } = item;

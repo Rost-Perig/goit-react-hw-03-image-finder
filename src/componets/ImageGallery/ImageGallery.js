@@ -48,7 +48,6 @@ class ImageGallery extends Component {
                 status: 'resolved',
             });  
         };
-        
     };
 
 
@@ -66,19 +65,29 @@ class ImageGallery extends Component {
                 return this.setState({status: 'failed'})
             };
 
+            
             this.setState(prevState => {
+                let scrollToElId = prevState.imgObjArr[prevState.imgObjArr.length - 1].id;
+                this.scrollPoint = window.scrollY + Math.floor(document.querySelector(`[id="${scrollToElId}"]`).getBoundingClientRect().bottom) - 32;
                 return ({
                     imgObjArr: [...prevState.imgObjArr, ...newRequest.data.hits],
                     page: newPage,
                     totalImg: newRequest.data.totalHits,
+                    
                 })
             });
-            
-            window.scrollTo({
-                top: document.documentElement.scrollHeight,
+
+            setTimeout(this.scrollFoo, 300);
+        };
+    };
+
+    scrollPoint = 0;
+
+    scrollFoo = () => {
+        window.scrollTo({
+                top: this.scrollPoint,
                 behavior: 'smooth',
             }); 
-        };
     };
 
     closeModalClick = (data) => {
@@ -149,7 +158,8 @@ class ImageGallery extends Component {
                     </ul>
                         
                     {(page * 12 < totalImg) && <Button buttonClick={loadMore}/>}
-                    {(page * 12 >= totalImg) && <h2 className={s.galleryTitle}>Запрос "{searchQuery.toUpperCase()}" успешно выполнен</h2>}  
+                    {(page * 12 >= totalImg) && <h2 className={s.galleryTitle}>Запрос "{searchQuery.toUpperCase()}" успешно выполнен</h2>}
+                      
                 </div>
                     
                 {showModal &&

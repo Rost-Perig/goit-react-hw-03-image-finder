@@ -4,13 +4,26 @@ import PropTypes from 'prop-types';
 import { ImSearch } from 'react-icons/im';
 import s from './Searchbar.module.css';
 
+const INITIAL_QUERY = 'hdr';
+
 class Searchbar extends Component {
 
     state = {
-       searchQuery: '',
+       searchQuery: INITIAL_QUERY,
     };
 
     inputRef = React.createRef();
+
+    componentDidMount() {
+        this.props.searchQueryToUp(this.state.searchQuery);
+        
+        this.setState({ searchQuery: '' });
+
+        if (!this.state.searchQuery) {
+            return this.inputRef.current.placeholder = 'search';
+        };
+        this.inputRef.current.placeholder = this.state.searchQuery;
+    }
 
     handleInputChange = e => this.setState ({searchQuery: e.currentTarget.value,});
     

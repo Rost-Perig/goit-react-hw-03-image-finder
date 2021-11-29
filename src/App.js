@@ -13,7 +13,7 @@ class App extends Component {
     searchQuery: '',
   };
 
-  searchQuerySubmit = searchQuery => this.setState({ searchQuery });
+  searchQuerySubmit = query => this.setState({searchQuery: query }); //запрос, пришедший с поисковой формы (снизу) передается в эту ф-цию и записывается в стейт, оттуда передается в проп галереи - запускается рендер
       
   render() {
 

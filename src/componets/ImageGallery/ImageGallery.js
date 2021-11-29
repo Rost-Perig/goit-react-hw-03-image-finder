@@ -11,7 +11,7 @@ import { imgOpen, changeModalImg } from '../../services/modal-service';
 
 class ImageGallery extends Component {
     state = {
-        searchQuery: null,
+        searchQuery: '',
         imgObjArr: [],
         page: 1,
         totalImg: 0,
